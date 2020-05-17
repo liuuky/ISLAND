@@ -1,9 +1,24 @@
+const bcrypt = require('bcryptjs')
 const { sequelize } = require('../../core/db')
 
 const { Sequelize, Model } = require('sequelize')
 
 class User extends Model {
-
+  static async verifyEmailPassword (email, plainPassword) {
+    const user = await User.findOne({
+      where: {
+        email
+      }
+    })
+    if (!user) {
+      throw new global.errs.AuthFailed('账号不存在')
+    }
+    const correct = bcrypt.compareSync(plainPassword, user.password)
+    if (!correct) {
+      throw new global.errs.AuthFailed('密码不正确')
+    }
+    return user
+  }
 }
 
 User.init({
@@ -17,7 +32,16 @@ User.init({
     type: Sequelize.STRING(128),
     unique: true
   },
-  password: Sequelize.STRING,
+  password: {
+    // 设计模式：观察者模式
+    type: Sequelize.STRING,
+    set(val) {
+      const salt = bcrypt.genSaltSync(10)
+      // 10可以理解为安全性、数字越大安全性越高
+      const pwd = bcrypt.hashSync(val, salt)
+      this.setDataValue('password', pwd)
+    }
+  },
   openid: {
     type: Sequelize.STRING(64),
     unique: true

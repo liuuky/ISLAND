@@ -3,6 +3,7 @@ const Router = require("koa-router")
 
 const { RegisterValidator } = require('../../validators/validator')
 const { User } = require('../../models/user')
+const { success } = require('../../lib/helper')
 
 const router = new Router({
   prefix: '/v1/user'
@@ -16,16 +17,20 @@ const router = new Router({
   // email password1 password2 nickname
 router.post('/register', async (ctx) => {
   const v = await new RegisterValidator().validate(ctx)
-  const salt = bcrypt.genSaltSync(10)
-  // 10可以理解为安全性、数字越大安全性越高
-  const pwd = bcrypt.hashSync(v.get('body.password2', salt))
   const user = {
     email: v.get('body.email'),
-    password: pwd,
+    password: v.get('body.password2'),
     nickname: v.get('body.nickname')
   }
   const r = await User.create(user)
-  
+  // 方式一
+  throw new global.errs.Success()
+  // 方式二
+  // success()
+  // 方式三
+  // ctx.body = {
+  //   msg: ''
+  // }
 })
 
 module.exports = router

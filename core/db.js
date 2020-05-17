@@ -25,8 +25,9 @@ const sequelize = new Sequelize(dbName, user, password, {
   }
 })
 
+// 数据库是否每次运行都清除
 sequelize.sync({
-  force: true
+  force: false
 })
 
 module.exports = {

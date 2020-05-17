@@ -6,6 +6,7 @@ class InitManager {
     // 入口方法
     InitManager.app = app
     InitManager.initLoadRouters()
+    InitManager.loadHttpException() // 将http-exception放在global全局上，方便其他模块直接使用
     InitManager.loadConfig()
   }
 
@@ -30,6 +31,13 @@ class InitManager {
       }
     }
   }  
+
+  // 将http-exception放在global全局上，方便其他模块直接使用
+  static loadHttpException () {
+    const errors = require('./http-exception')
+    global.errs = errors
+  }
+
 }
 
 module.exports = InitManager
