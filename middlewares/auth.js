@@ -47,6 +47,16 @@ class Auth {
       // HTTP 规定 身份验证机制 HttpBasicAuth
     }
   }
+
+  // 验证token是否有效
+  static verifyToken(token) {
+    try {
+      jwt.verify(token, global.config.security.secretKey)
+      return true
+    } catch (error) {
+      return false
+    }
+  }
 }
 
 module.exports = {
